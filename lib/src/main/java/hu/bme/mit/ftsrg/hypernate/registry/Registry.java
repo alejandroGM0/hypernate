@@ -4,6 +4,7 @@ package hu.bme.mit.ftsrg.hypernate.registry;
 import com.jcabi.aspects.Loggable;
 import hu.bme.mit.ftsrg.hypernate.annotations.AttributeInfo;
 import hu.bme.mit.ftsrg.hypernate.annotations.PrimaryKey;
+import hu.bme.mit.ftsrg.hypernate.registry.query.RichQueryBuilder;
 import hu.bme.mit.ftsrg.hypernate.util.JSON;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -204,6 +205,20 @@ public class Registry {
               return EntityUtil.fromBuffer(value, clazz);
             })
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Start building a CouchDB rich query for the given entity type.
+   *
+   * <p>Warning: Rich queries read directly from CouchDB and will not see uncommitted writes
+   * buffered by the middleware cache within the same transaction.
+   *
+   * @param clazz the class of the entity to query
+   * @param the entity type
+   * @return a {@link RichQueryBuilder} to build and execute the query
+   */
+  public <T> RichQueryBuilder<T> richQuery(final Class<T> clazz) {
+    return new RichQueryBuilder<>(stub, clazz);
   }
 
   @Loggable(Loggable.DEBUG)
